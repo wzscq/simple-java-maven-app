@@ -6,24 +6,20 @@ pipeline {
         }
     }
     stages {
+    		def remote = [:]
+		    remote.name = 'test'
+		    remote.host = '47.89.245.19'
+		    remote.user = 'root'
+		    remote.password = '2Gb6g99dq5'
+		    remote.allowAnyHosts = true
+		    stage('Remote SSH') {
+      		sshCommand remote: remote, command: "ls -lrt"
+      		sshCommand remote: remote, command: "for i in {1..5}; do echo -n \"Loop \$i \"; date ; sleep 1; done"
+    		}
+        
         stage('Build') { 
             steps {
                 sh 'mvn -B -DskipTests clean package' 
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
-        stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
             }
         }
     }
